@@ -3,13 +3,18 @@ on:
   pull_request:
     types:
       - closed
+env:
+  HUMCTL_VERSION: '0.13.0'
 jobs:
   cleanup:
     runs-on: ubuntu-latest
     steps:
+      - uses: humanitec/setup-cli-action@v1
+        with:
+          version: ${{ env.HUMCTL_VERSION }}
       - name: Delete Humanitec Env
         run: |
-            curl -X DELETE \
-            -H "Content-Type: application/json" \
-            -H 'Authorization: Bearer ${{ secrets.HUMANITEC_TOKEN }}' \
-            https://api.humanitec.io/orgs/${{ vars.HUMANITEC_ORG }}/apps/${{ vars.APP_NAME }}/envs/pr-${{ github.event.number }}
+          humctl delete env pr-${{ github.event.number }} \
+              --token ${{ secrets.HUMANITEC_TOKEN }} \
+              --org ${{ vars.HUMANITEC_ORG }} \
+              --app ${{ vars.APP_NAME }}
