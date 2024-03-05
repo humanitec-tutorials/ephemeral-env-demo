@@ -8,7 +8,7 @@ permissions:
   pull-requests: write
 env:
   ENVIRONMENT: 'development'
-  SCORE_HUMANITEC_VERSION: 0.9.1
+  SCORE_HUMANITEC_VERSION: '0.10.2'
 jobs:
   build:
     runs-on: ubuntu-latest
