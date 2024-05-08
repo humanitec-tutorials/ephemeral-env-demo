@@ -8,23 +8,21 @@ permissions:
   pull-requests: write
 env:
   ENVIRONMENT: 'development'
-  SCORE_HUMANITEC_VERSION: '0.10.2'
+  HUMCTL_VERSION: '0.23.2'
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: score-spec/setup-score@v2
+      - uses: humanitec/setup-cli-action@v1
         with:
-          file: score-humanitec
-          version: ${{ env.SCORE_HUMANITEC_VERSION }}
+          version: ${{ env.HUMCTL_VERSION }}
       - name: Run Score
         run: |
-          score-humanitec delta \
-              --retry \
-              --deploy \
+          humctl score deploy \
               --token ${{ secrets.HUMANITEC_TOKEN }} \
               --org ${{ vars.HUMANITEC_ORG }} \
               --app ${{ vars.APP_NAME }} \
               --env ${{ env.ENVIRONMENT }} \
-              | tee score_output.json
+              -f score.yaml \
+              --extensions humanitec.score.yaml

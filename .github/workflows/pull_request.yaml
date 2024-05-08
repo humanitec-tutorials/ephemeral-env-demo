@@ -8,8 +8,7 @@ permissions:
 env:
   BASE_ENVIRONMENT: 'development'
   ENVIRONMENT_TYPE: 'development'
-  SCORE_HUMANITEC_VERSION: '0.10.2'
-  HUMCTL_VERSION: '0.14.0'
+  HUMCTL_VERSION: '0.23.2'
   ENVIRONMENT_ID: pr-${{ github.event.number }}
   ENVIRONMENT_NAME: PR-${{ github.event.number }}
 jobs:
@@ -36,46 +35,24 @@ jobs:
           version: ${{ env.SCORE_HUMANITEC_VERSION }}
       - name: Run Score
         run: |
-          score-humanitec delta \
-              --retry \
-              --deploy \
+          humctl score deploy \
+              -f score.yaml \
+              --extensions humanitec.score.yaml \
               --token ${{ secrets.HUMANITEC_TOKEN }} \
               --org ${{ vars.HUMANITEC_ORG }} \
               --app ${{ vars.APP_NAME }} \
               --env ${{ env.ENVIRONMENT_ID }} \
-              | tee score_output.json
-      - name: Wait for deployment
-        run: |
-          sleep 1
-
-          IS_DONE=false
-
-          while [ "$IS_DONE" = false ]; do
-            CURRENT_STATUS=$(humctl get deployment . -o json \
-              --token ${{ secrets.HUMANITEC_TOKEN }} \
-              --org ${{ vars.HUMANITEC_ORG }} \
-              --app ${{ vars.APP_NAME }} \
-              --env ${{ env.ENVIRONMENT_ID }} \
-              | jq -r .status.status)
-            if [ "$CURRENT_STATUS" = "in progress" ]; then
-              echo "Deployment still in progress..."
-              sleep 1
-            elif [ "$CURRENT_STATUS" = "failed" ]; then
-              echo "Deployment failed!"
-              IS_DONE=true
-            else
-              echo "Deployment complete!"
-              IS_DONE=true
-            fi
-          done
-          if [ "$CURRENT_STATUS" = "failed" ]; then
-              exit 1
-          fi
+              --wait
       - name: Build Comment Message
         if: ${{ always() }}
         run: |
-          ENV_URL=$(jq -r ".metadata.url" score_output.json)
-          DEPLOYMENT_ID=$(jq -r ".id" score_output.json)
+          DEPLOYMENT_ID=$(humctl get deployment . -o json \
+              --token ${{ secrets.HUMANITEC_TOKEN }} \
+              --org ${{ vars.HUMANITEC_ORG }} \
+              --app ${{ vars.APP_NAME }} \
+              --env ${{ env.ENVIRONMENT_ID }} \
+              | jq -r .metadata.id)
+          ENV_URL="https://app.humanitec.io/orgs/"${{ vars.HUMANITEC_ORG }}"/apps/"${{ vars.APP_NAME }}"/envs/"${{ env.ENVIRONMENT_ID }}"/deploys/"${DEPLOYMENT_ID}
           DOMAINS=$(humctl get active-resources \
                       --token ${{ secrets.HUMANITEC_TOKEN }} \
                       --org ${{ vars.HUMANITEC_ORG }} \
@@ -131,8 +108,8 @@ jobs:
           echo "" >> pr_message.txt
           humctl diff sets env/${{ env.ENVIRONMENT_ID }} env/${{ env.BASE_ENVIRONMENT }} \
               --token ${{ secrets.HUMANITEC_TOKEN }} \
-              --org ${{ vars.HUMANITEC_ORG }} \
-              --app ${{ vars.APP_NAME }} -o json >> pr_message.txt
+              --org ${{ vars.HUMANITEC_ORG_ID }} \
+              --app ${{ env.APP_NAME }} -o json >> pr_message.txt
           echo "" >> pr_message.txt
           echo '```' >> pr_message.txt
           echo "" >> pr_message.txt
@@ -170,17 +147,6 @@ jobs:
             echo "" >> pr_message.txt
             echo "</details>" >> pr_message.txt
           fi
-
-          echo "<details><summary>Score Output</summary>" >> pr_message.txt
-          echo "" >> pr_message.txt
-          echo "### Score Output:" >> pr_message.txt
-          echo '```json' >> pr_message.txt
-          echo "" >> pr_message.txt
-          cat score_output.json >> pr_message.txt
-          echo "" >> pr_message.txt
-          echo '```' >> pr_message.txt
-          echo "" >> pr_message.txt
-          echo "</details>" >> pr_message.txt
 
           cat pr_message.txt
       - name: Comment PR
