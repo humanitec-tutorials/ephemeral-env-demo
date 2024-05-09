@@ -130,8 +130,7 @@ jobs:
             echo '```' >> pr_message.txt
             echo "" >> pr_message.txt
             echo "</details>" >> pr_message.txt
-          fi
-          if [ "$DEPLOYMENT_ERRORS" = "[]" ]; then
+          
             echo "<details><summary>Resources Graph</summary>" >> pr_message.txt
             echo "" >> pr_message.txt
             echo "### Resources Graph:" >> pr_message.txt
