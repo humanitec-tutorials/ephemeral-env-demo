@@ -3,7 +3,7 @@ ARG GH_REPOSITORY
 FROM node:slim
 
 # Make image public by default on ghcr.io
-LABEL org.opencontainers.image.source=https://github.com/$GH_REPOSITORY
+# LABEL org.opencontainers.image.source=https://github.com/$GH_REPOSITORY
 
 COPY package*.json ./
 
