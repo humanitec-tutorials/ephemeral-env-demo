@@ -47,4 +47,4 @@ jobs:
               --app ${{ vars.APP_NAME }} \
               --env ${{ env.ENVIRONMENT }} \
               -f score.yaml \
-              --property "containers.demo.image${{ steps.build_push.outputs.IMAGE_TAG }}"
+              --property "containers.demo.image=${{ steps.build_push.outputs.IMAGE_TAG }}"
