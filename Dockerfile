@@ -4,7 +4,7 @@ FROM node:slim
 
 # Make image public by default on ghcr.io
 # LABEL org.opencontainers.image.source=https://github.com/$GH_REPOSITORY
-LABEL org.opencontainers.image.source=https://github.com/tobmasterhumanitec/ephemeral-env-demo
+LABEL org.opencontainers.image.source=https://github.com/TobmasterHumanitec/ephemeral-env-demo
 
 COPY package*.json ./
 
