@@ -30,7 +30,7 @@ jobs:
         # ❓ only if event in [opened, reopened]
         run: |
             echo GH event name: ${{ github.event_name }}
-            echo GH event: ${{ fromJSON(github.event) }}
+            echo GH event action: ${{ github.event.action }}
 
             humctl create environment ${{ env.ENVIRONMENT_ID }} \
               --token ${{ secrets.HUMANITEC_TOKEN }} \
