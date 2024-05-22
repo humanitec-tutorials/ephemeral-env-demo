@@ -19,7 +19,7 @@ jobs:
         with:
           version: ${{ env.HUMCTL_VERSION }}
 
-      # ❓ Do we really need that for ghcr?
+      # ❓ Do we really need that for ghcr??
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v1
         with:
