@@ -20,12 +20,12 @@ jobs:
           version: ${{ env.HUMCTL_VERSION }}
 
       # ❓ Do we really need that for ghcr??
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v1
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GH_TOKEN }}
+      # - name: Login to GitHub Container Registry
+      #   uses: docker/login-action@v1
+      #   with:
+      #     registry: ghcr.io
+      #     username: ${{ github.actor }}
+      #     password: ${{ secrets.GH_TOKEN }}
 
       - name: Build and push image
         id: build_push
@@ -35,11 +35,8 @@ jobs:
 
           TAG=$GH_REPOSITORY:latest
           IMAGE=ghcr.io/$TAG
-          
-          echo GH_REPOSITORY: $GH_REPOSITORY
-          echo IMAGE: $IMAGE
 
-          # Set the label to connect the package to the GitHub repo and make it public
+          # Set this label to connect the package to the GitHub repo to make it public
           docker build . --tag $IMAGE  \
             --label "org.opencontainers.image.source=https://github.com/$GH_REPOSITORY"
           docker push $IMAGE
