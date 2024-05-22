@@ -37,13 +37,16 @@ jobs:
           #TAG=ghcr.io/$(echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]')/${{ vars.APP_NAME }}:latest
           
           TAG=$GH_REPOSITORY:latest
+          IMAGE=ghcr.io/$TAG
+
           echo GH_REPOSITORY: $GH_REPOSITORY
           echo TAG: $TAG
+          echo IMAGE: $IMAGE
 
           docker build . --tag $TAG --build-arg GH_REPOSITORY=$GH_REPOSITORY
           docker push $TAG
 
-          echo "IMAGE_TAG=$TAG" >> $GITHUB_OUTPUT
+          echo "IMAGE=$IMAGE" >> $GITHUB_OUTPUT
 
       - name: Deploy Score
         run: |
@@ -53,4 +56,4 @@ jobs:
               --app ${{ vars.APP_NAME }} \
               --env ${{ env.ENVIRONMENT }} \
               -f score.yaml \
-              --property "containers.demo.image=${{ steps.build_push.outputs.IMAGE_TAG }}"
+              --property "containers.demo.image=${{ steps.build_push.outputs.IMAGE }}"
