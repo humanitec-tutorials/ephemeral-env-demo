@@ -31,14 +31,13 @@ jobs:
         id: build_push
         run: |
           # Make sure repo name is all lowercase for docker push
-          REPO=$(echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]')
           TAG=ghcr.io/$(echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]')/${{ vars.APP_NAME }}:latest
-          echo github.repository_owner: ${{ github.repository_owner }}
-          echo repo: $REPO
-          echo tag: $TAG
-          echo vars.APP_NAME: ${{ vars.APP_NAME }}
+          echo Using image tag: $TAG
+
           docker build . --tag $TAG
           docker push $TAG
+
+          echo "IMAGE_TAG=$TAG" >> $GITHUB_OUTPUT
 
       - name: Deploy Score
         run: |
@@ -48,4 +47,4 @@ jobs:
               --app ${{ vars.APP_NAME }} \
               --env ${{ env.ENVIRONMENT }} \
               -f score.yaml \
-              --property "containers.demo.image=ghcr.io/${{ github.repository_owner }}/${{ vars.APP_NAME }}:latest" \
+              --property "containers.demo.image${{ steps.build_push.outputs.IMAGE_TAG }}"

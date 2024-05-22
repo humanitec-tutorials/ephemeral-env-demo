@@ -12,7 +12,7 @@ service:
 
 # Define the containers that make up this service
 containers:
-  frontend:
+  demo:
     image: . # Set by pipeline
     variables:
       MESSAGE: "Hello World!"
