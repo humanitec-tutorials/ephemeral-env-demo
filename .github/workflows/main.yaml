@@ -39,7 +39,7 @@ jobs:
           echo GH_REPOSITORY: $GH_REPOSITORY
           echo IMAGE: $IMAGE
 
-          docker build . --tag $IMAGE --build-arg GH_REPOSITORY=$GH_REPOSITORY
+          docker build . --tag $IMAGE --build-arg GH_REPOSITORY=$GH_REPOSITORY  --label "org.opencontainers.image.source=https://github.com/TobmasterHumanitec/ephemeral-env-demo"
           docker push $IMAGE
 
           echo "IMAGE=$IMAGE" >> $GITHUB_OUTPUT
