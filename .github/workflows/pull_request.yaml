@@ -28,6 +28,7 @@ jobs:
       
       - name: Create Humanitec Env
         # ❓ only if event in [opened, reopened]
+        if:  ${{ github.event.action == 'opened'  || github.event.action == 'reopened' }}
         run: |
             echo GH event name: ${{ github.event_name }}
             echo GH event action: ${{ github.event.action }}
