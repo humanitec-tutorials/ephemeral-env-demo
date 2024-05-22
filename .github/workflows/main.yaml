@@ -35,8 +35,11 @@ jobs:
           GH_REPOSITORY=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')
 
           #TAG=ghcr.io/$(echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]')/${{ vars.APP_NAME }}:latest
+          
           TAG=$GH_REPOSITORY:latest
-          echo Using image tag: $TAG
+          echo GH_REPOSITORY: $GH_REPOSITORY
+          echo TAG: $TAG
+
           docker build . --tag $TAG --build-arg GH_REPOSITORY=$GH_REPOSITORY
           docker push $TAG
 
