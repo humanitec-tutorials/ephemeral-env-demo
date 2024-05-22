@@ -30,7 +30,7 @@ jobs:
       - name: Build image
         run: |
           # Make sure repo name is all lowercase for docker push
-          REPO = $(echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]')
+          REPO=$(echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]')
           echo github.repository_owner: ${{ github.repository_owner }}
           echo repo: $REPO
           echo vars.APP_NAME: ${{ vars.APP_NAME }}
