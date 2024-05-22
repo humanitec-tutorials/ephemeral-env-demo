@@ -36,9 +36,7 @@ jobs:
           # Set this label to connect the package to the GitHub repo to make it public
           docker build . --tag $IMAGE  \
             --label "org.opencontainers.image.source=https://github.com/$GH_REPOSITORY"
-          
           docker push $IMAGE
-
           echo "IMAGE=$IMAGE" >> $GITHUB_OUTPUT
 
       - name: Deploy Score
