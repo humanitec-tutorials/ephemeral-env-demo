@@ -29,6 +29,8 @@ jobs:
       - name: Create Humanitec Env
         # ❓ only if event in [opened, reopened]
         run: |
+            echo GH event name: ${{ github.event_name }}
+
             humctl create environment ${{ env.ENVIRONMENT_ID }} \
               --token ${{ secrets.HUMANITEC_TOKEN }} \
               --org ${{ vars.HUMANITEC_ORG }} \
