@@ -64,7 +64,6 @@ jobs:
         run: |
           humctl score deploy \
               -f score.yaml \
-              --extensions humanitec.score.yaml \
               --token ${{ secrets.HUMANITEC_TOKEN }} \
               --org ${{ vars.HUMANITEC_ORG }} \
               --app ${{ vars.APP_NAME }} \
