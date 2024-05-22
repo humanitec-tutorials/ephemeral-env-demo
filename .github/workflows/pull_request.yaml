@@ -20,6 +20,7 @@ jobs:
         with:
           version: ${{ env.HUMCTL_VERSION }}
       - name: Create Humanitec Env
+        # ❓ only if event in [opened, reopened]
         run: |
             humctl create environment ${{ env.ENVIRONMENT_ID }} \
               --token ${{ secrets.HUMANITEC_TOKEN }} \
@@ -29,10 +30,6 @@ jobs:
               -t ${{ env.ENVIRONMENT_TYPE }} \
               --from ${{ env.BASE_ENVIRONMENT }} \
               || true
-      - uses: score-spec/setup-score@v2
-        with:
-          file: score-humanitec
-          version: ${{ env.SCORE_HUMANITEC_VERSION }}
       - name: Run Score
         run: |
           humctl score deploy \

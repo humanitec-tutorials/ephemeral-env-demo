@@ -1,0 +1,9 @@
+{
+  "name": "ephemeral-env-demo",
+  "version": "1.0.0",
+  "description": "Set up ephemeral environments using Score with the Humanitec Platform Orchestrator.",
+  "main": "index.js",
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}

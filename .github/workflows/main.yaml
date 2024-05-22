@@ -14,10 +14,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+
       - uses: humanitec/setup-cli-action@v1
         with:
           version: ${{ env.HUMCTL_VERSION }}
-      - name: Run Score
+
+      # ❓ Do we really need that for ghcr?
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GH_TOKEN }}
+
+      - name: Build image
+        run: |
+          echo github.repository_owner: ${{ github.repository_owner }}
+          echo vars.APP_NAME: ${{ vars.APP_NAME }}
+          docker build . --tag ghcr.io/${{ github.repository_owner }}/${{ vars.APP_NAME }}:latest
+          docker push ghcr.io/${{ github.repository_owner }}/${{ vars.APP_NAME }}:latest
+
+      - name: Deploy Score
         run: |
           humctl score deploy \
               --token ${{ secrets.HUMANITEC_TOKEN }} \
@@ -25,4 +42,5 @@ jobs:
               --app ${{ vars.APP_NAME }} \
               --env ${{ env.ENVIRONMENT }} \
               -f score.yaml \
+              --property "containers.demo.image=ghcr.io/${{ github.repository_owner }}/${{ vars.APP_NAME }}:latest" \
               --extensions humanitec.score.yaml

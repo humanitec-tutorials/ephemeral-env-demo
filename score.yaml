@@ -13,15 +13,9 @@ service:
 # Define the containers that make up this service
 containers:
   frontend:
-    image: registry.humanitec.io/public/sample-score-app:latest
+    image: . # Set by pipeline
     variables:
       MESSAGE: "Hello World!"
-      PORT: "3000"
-      DB_DATABASE: ${resources.db.name}
-      DB_USER: ${resources.db.username}
-      DB_PASSWORD: ${resources.db.password}
-      DB_HOST: ${resources.db.host}
-      DB_PORT: ${resources.db.port}
 
 # Define the resources that this service needs
 resources:
@@ -33,5 +27,3 @@ resources:
       host: ${resources.dns.host}
       path: /
       port: 80
-  db:  # We need a database to store data
-    type: postgres
