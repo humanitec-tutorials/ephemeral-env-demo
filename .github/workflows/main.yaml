@@ -35,6 +35,7 @@ jobs:
 
           TAG=$GH_REPOSITORY:latest
           IMAGE=ghcr.io/$TAG
+          
           echo GH_REPOSITORY: $GH_REPOSITORY
           echo IMAGE: $IMAGE
 
