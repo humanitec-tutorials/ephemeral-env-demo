@@ -79,7 +79,7 @@ jobs:
               --app ${{ vars.APP_NAME }} \
               --env ${{ env.ENVIRONMENT_ID }} \
               | jq -r .metadata.id)
-          
+
           ENV_URL="https://app.humanitec.io/orgs/"${{ vars.HUMANITEC_ORG }}"/apps/"${{ vars.APP_NAME }}"/envs/"${{ env.ENVIRONMENT_ID }}"/deploys/"${DEPLOYMENT_ID}
 
           DOMAINS=$(humctl get active-resources \
@@ -95,32 +95,32 @@ jobs:
               --app ${{ vars.APP_NAME }} \
               --env ${{ env.ENVIRONMENT_ID }} -o json)
           
-          # if [ "$DEPLOYMENT_ERRORS" = "[]" ]; then
-          #   echo "## Deployment successfully completed for ${{ env.ENVIRONMENT_NAME }}! :tada:" >> pr_message.txt
-          #   echo "" >> pr_message.txt
-          # else
-          #   echo "## Deployment failed for ${{ env.ENVIRONMENT_NAME }}! :x:" >> pr_message.txt
-          #   echo "" >> pr_message.txt
-          #   echo "### Errors:" >> pr_message.txt
-          #   echo "" >> pr_message.txt
-          #   echo '```json' >> pr_message.txt
-          #   echo "" >> pr_message.txt
-          #   echo "$DEPLOYMENT_ERRORS" | jq .[0].status.message -r >> pr_message.txt
-          #   echo "" >> pr_message.txt
-          #   echo '```' >> pr_message.txt
-          #   echo "" >> pr_message.txt
-          #   echo "<details><summary>Errors details</summary>" >> pr_message.txt
-          #   echo "" >> pr_message.txt
-          #   echo "### Errors details:" >> pr_message.txt
-          #   echo '```json' >> pr_message.txt
-          #   echo "" >> pr_message.txt
-          #   echo "$DEPLOYMENT_ERRORS" >> pr_message.txt
-          #   echo "" >> pr_message.txt
-          #   echo '```' >> pr_message.txt
-          #   echo "" >> pr_message.txt
-          #   echo "</details>" >> pr_message.txt
-          #   echo "" >> pr_message.txt
-          # fi
+          if [ "$DEPLOYMENT_ERRORS" = "[]" ]; then
+            echo "## Deployment successfully completed for ${{ env.ENVIRONMENT_NAME }}! :tada:" >> pr_message.txt
+            echo "" >> pr_message.txt
+          else
+            echo "## Deployment failed for ${{ env.ENVIRONMENT_NAME }}! :x:" >> pr_message.txt
+            echo "" >> pr_message.txt
+            echo "### Errors:" >> pr_message.txt
+            echo "" >> pr_message.txt
+            echo '```json' >> pr_message.txt
+            echo "" >> pr_message.txt
+            echo "$DEPLOYMENT_ERRORS" | jq .[0].status.message -r >> pr_message.txt
+            echo "" >> pr_message.txt
+            echo '```' >> pr_message.txt
+            echo "" >> pr_message.txt
+            echo "<details><summary>Errors details</summary>" >> pr_message.txt
+            echo "" >> pr_message.txt
+            echo "### Errors details:" >> pr_message.txt
+            echo '```json' >> pr_message.txt
+            echo "" >> pr_message.txt
+            echo "$DEPLOYMENT_ERRORS" >> pr_message.txt
+            echo "" >> pr_message.txt
+            echo '```' >> pr_message.txt
+            echo "" >> pr_message.txt
+            echo "</details>" >> pr_message.txt
+            echo "" >> pr_message.txt
+          fi
           
           # echo "### [View in Humanitec]($ENV_URL)" >> pr_message.txt
           # echo "Deployment ID: $DEPLOYMENT_ID" >> pr_message.txt
