@@ -122,28 +122,28 @@ jobs:
             echo "" >> pr_message.txt
           fi
           
-          # echo "### [View in Humanitec]($ENV_URL)" >> pr_message.txt
-          # echo "Deployment ID: $DEPLOYMENT_ID" >> pr_message.txt
+          echo "### [View in Platform Orchestrator]($ENV_URL)" >> pr_message.txt
+          echo "Deployment ID: $DEPLOYMENT_ID" >> pr_message.txt
 
-          # echo "" >> pr_message.txt
-          # echo "### Domains:" >> pr_message.txt
-          # echo "" >> pr_message.txt
-          # echo "$DOMAINS" >> pr_message.txt
-          # echo "" >> pr_message.txt
+          echo "" >> pr_message.txt
+          echo "### Domains:" >> pr_message.txt
+          echo "" >> pr_message.txt
+          echo "$DOMAINS" >> pr_message.txt
+          echo "" >> pr_message.txt
 
-          # echo "<details><summary>Deployment diff</summary>" >> pr_message.txt
-          # echo "" >> pr_message.txt
-          # echo "### Deployment diff:" >> pr_message.txt
-          # echo '```json' >> pr_message.txt
-          # echo "" >> pr_message.txt
-          # humctl diff sets env/${{ env.ENVIRONMENT_ID }} env/${{ env.BASE_ENVIRONMENT }} \
-          #     --token ${{ secrets.HUMANITEC_TOKEN }} \
-          #     --org ${{ vars.HUMANITEC_ORG_ID }} \
-          #     --app ${{ env.APP_NAME }} -o json >> pr_message.txt
-          # echo "" >> pr_message.txt
-          # echo '```' >> pr_message.txt
-          # echo "" >> pr_message.txt
-          # echo "</details>" >> pr_message.txt
+          echo "<details><summary>Deployment diff</summary>" >> pr_message.txt
+          echo "" >> pr_message.txt
+          echo "### Deployment diff:" >> pr_message.txt
+          echo '```json' >> pr_message.txt
+          echo "" >> pr_message.txt
+          humctl diff sets env/${{ env.ENVIRONMENT_ID }} env/${{ env.BASE_ENVIRONMENT }} \
+              --token ${{ secrets.HUMANITEC_TOKEN }} \
+              --org ${{ vars.HUMANITEC_ORG_ID }} \
+              --app ${{ env.APP_NAME }} -o json >> pr_message.txt
+          echo "" >> pr_message.txt
+          echo '```' >> pr_message.txt
+          echo "" >> pr_message.txt
+          echo "</details>" >> pr_message.txt
 
           # if [ "$DEPLOYMENT_ERRORS" = "[]" ]; then
           #   echo "<details><summary>Active Resources Usage</summary>" >> pr_message.txt
