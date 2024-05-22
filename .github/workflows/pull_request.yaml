@@ -13,9 +13,6 @@ env:
   ENVIRONMENT_ID: pr-${{ github.event.number }}
   ENVIRONMENT_NAME: PR-${{ github.event.number }}
 
-# env:
-#  BRANCH_NAME: ${{ github.head_ref || github.ref_name }} 
-
 jobs:
   build:
     runs-on: ubuntu-latest
