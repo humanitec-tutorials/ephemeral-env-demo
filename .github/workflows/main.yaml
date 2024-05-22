@@ -27,15 +27,18 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GH_TOKEN }}
 
-      - name: Build image
+      - name: Build and push image
+        id: build_push
         run: |
           # Make sure repo name is all lowercase for docker push
           REPO=$(echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]')
+          TAG=ghcr.io/$(echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]')/${{ vars.APP_NAME }}:latest
           echo github.repository_owner: ${{ github.repository_owner }}
           echo repo: $REPO
+          echo tag: $TAG
           echo vars.APP_NAME: ${{ vars.APP_NAME }}
-          docker build . --tag ghcr.io/$REPO/${{ vars.APP_NAME }}:latest
-          docker push ghcr.io/$REPO/${{ vars.APP_NAME }}:latest
+          docker build . --tag $TAG
+          docker push $TAG
 
       - name: Deploy Score
         run: |
@@ -46,4 +49,3 @@ jobs:
               --env ${{ env.ENVIRONMENT }} \
               -f score.yaml \
               --property "containers.demo.image=ghcr.io/${{ github.repository_owner }}/${{ vars.APP_NAME }}:latest" \
-              --extensions humanitec.score.yaml
