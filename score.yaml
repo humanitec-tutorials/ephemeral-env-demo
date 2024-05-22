@@ -7,8 +7,8 @@ metadata:
 service:
   ports:
     www:
-      port: 80 # The port that the service will be exposed on
-      targetPort: 3000 # The port that the container will be listening on
+      port: 8080 # The port that the service will be exposed on
+      targetPort: 8080 # The port that the container will be listening on
 
 # Define the containers that make up this service
 containers:
