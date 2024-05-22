@@ -3,9 +3,9 @@ on:
   push:
     branches:
       - "main"
-permissions:
-  contents: read
-  pull-requests: write
+# permissions:
+#   contents: read
+#   pull-requests: write
 env:
   ENVIRONMENT: 'development'
   HUMCTL_VERSION: '0.23.2'
