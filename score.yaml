@@ -18,12 +18,12 @@ containers:
       MESSAGE: "Hello World!"
 
 # Define the resources that this service needs
-resources:
-  dns: # We need a DNS record to point to the service 
-    type: dns
-  route: # We need a route attach to the DNS record 
-    type: route
-    params:
-      host: ${resources.dns.host}
-      path: /
-      port: 80
+# resources:
+#   dns: # We need a DNS record to point to the service 
+#     type: dns
+#   route: # We need a route attach to the DNS record 
+#     type: route
+#     params:
+#       host: ${resources.dns.host}
+#       path: /
+#       port: 80
