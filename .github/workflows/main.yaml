@@ -39,7 +39,9 @@ jobs:
           echo GH_REPOSITORY: $GH_REPOSITORY
           echo IMAGE: $IMAGE
 
-          docker build . --tag $IMAGE --build-arg GH_REPOSITORY=$GH_REPOSITORY  --label "org.opencontainers.image.source=https://github.com/TobmasterHumanitec/ephemeral-env-demo"
+          # Set the label to connect the package to the GitHub repo and make it public
+          docker build . --tag $IMAGE  \
+            --label "org.opencontainers.image.source=https://github.com/$GH_REPOSITORY"
           docker push $IMAGE
 
           echo "IMAGE=$IMAGE" >> $GITHUB_OUTPUT
