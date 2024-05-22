@@ -31,20 +31,16 @@ jobs:
         id: build_push
         run: |
           # Make sure repo name is all lowercase for docker push
-          # GH_ORG=$(echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]')
           GH_REPOSITORY=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')
 
-          #TAG=ghcr.io/$(echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]')/${{ vars.APP_NAME }}:latest
-          
           TAG=$GH_REPOSITORY:latest
           IMAGE=ghcr.io/$TAG
 
           echo GH_REPOSITORY: $GH_REPOSITORY
-          echo TAG: $TAG
           echo IMAGE: $IMAGE
 
-          docker build . --tag $TAG --build-arg GH_REPOSITORY=$GH_REPOSITORY
-          docker push $TAG
+          docker build . --tag $IMAGE --build-arg GH_REPOSITORY=$GH_REPOSITORY
+          docker push $IMAGE
 
           echo "IMAGE=$IMAGE" >> $GITHUB_OUTPUT
 
