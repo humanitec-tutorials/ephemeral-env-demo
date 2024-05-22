@@ -28,7 +28,8 @@ jobs:
         id: build_push
         run: |
           # Make sure repo name is all lowercase for docker push
-          GH_REPOSITORY=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')
+          #GH_REPOSITORY=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')
+          GH_REPOSITORY=${{ github.repository }}
 
           TAG=$GH_REPOSITORY:latest
           IMAGE=ghcr.io/$TAG
@@ -36,6 +37,7 @@ jobs:
           # Set this label to connect the package to the GitHub repo to make it public
           docker build . --tag $IMAGE  \
             --label "org.opencontainers.image.source=https://github.com/$GH_REPOSITORY"
+          
           docker push $IMAGE
 
           echo "IMAGE=$IMAGE" >> $GITHUB_OUTPUT
