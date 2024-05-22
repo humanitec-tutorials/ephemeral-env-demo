@@ -29,10 +29,12 @@ jobs:
 
       - name: Build image
         run: |
+          REPO = ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]'
           echo github.repository_owner: ${{ github.repository_owner }}
+          echo repo: $REPO
           echo vars.APP_NAME: ${{ vars.APP_NAME }}
-          docker build . --tag ghcr.io/${{ github.repository_owner }}/${{ vars.APP_NAME }}:latest
-          docker push ghcr.io/${{ github.repository_owner }}/${{ vars.APP_NAME }}:latest
+          docker build . --tag ghcr.io/$REPO/${{ vars.APP_NAME }}:latest
+          docker push ghcr.io/$REPO/${{ vars.APP_NAME }}:latest
 
       - name: Deploy Score
         run: |
