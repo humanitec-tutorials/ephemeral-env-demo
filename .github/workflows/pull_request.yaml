@@ -70,6 +70,9 @@ jobs:
       - name: Build Comment Message
         if: ${{ always() }}
         run: |
+          # This step demonstrates a range of possible outputs you may want to include
+          # in your PR comments with each run of this workflow.
+          
           DEPLOYMENT_ID=$(humctl get deployment . -o json \
               --token ${{ secrets.HUMANITEC_TOKEN }} \
               --org ${{ vars.HUMANITEC_ORG }} \
