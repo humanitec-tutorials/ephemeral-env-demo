@@ -1,7 +1,7 @@
 apiVersion: score.dev/v1b1
 
 metadata:
-  name: hello-world
+  name: web-app
 
 # Define the ports that this service exposes
 service:
@@ -15,4 +15,4 @@ containers:
   demo:
     image: . # Set by pipeline
     variables:
-      MESSAGE: "Hello World!"
+      MESSAGE: "Hello deployer!"
