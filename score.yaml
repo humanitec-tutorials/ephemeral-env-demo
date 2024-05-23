@@ -16,14 +16,3 @@ containers:
     image: . # Set by pipeline
     variables:
       MESSAGE: "Hello World!"
-
-# Define the resources that this service needs
-resources:
-  dns: # We need a DNS record to point to the service 
-    type: dns
-  route: # We need a route attach to the DNS record 
-    type: route
-    params:
-      host: ${resources.dns.host}
-      path: /
-      port: 8080
