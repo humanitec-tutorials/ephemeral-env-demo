@@ -33,16 +33,14 @@ jobs:
       - name: Create Humanitec Env
         if: ${{ github.event.action == 'opened' || github.event.action == 'reopened' }}
         run: |
-            echo GH event name: ${{ github.event_name }}
-            echo GH event action: ${{ github.event.action }}
-
-            humctl create environment ${{ env.ENVIRONMENT_ID }} \
-              --token ${{ secrets.HUMANITEC_TOKEN }} \
-              --org ${{ vars.HUMANITEC_ORG }} \
-              --app ${{ vars.APP_NAME }} \
-              --name ${{ env.ENVIRONMENT_NAME }} \
-              -t ${{ env.ENVIRONMENT_TYPE }} \
-              --from ${{ env.BASE_ENVIRONMENT }}
+          humctl create environment ${{ env.ENVIRONMENT_ID }} \
+            --token ${{ secrets.HUMANITEC_TOKEN }} \
+            --org ${{ vars.HUMANITEC_ORG }} \
+            --app ${{ vars.APP_NAME }} \
+            --name ${{ env.ENVIRONMENT_NAME }} \
+            -t ${{ env.ENVIRONMENT_TYPE }} \
+            --from ${{ env.BASE_ENVIRONMENT }}
+        
       - name: Build and push image
         id: build_push
         run: |
