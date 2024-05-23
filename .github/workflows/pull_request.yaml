@@ -122,11 +122,13 @@ jobs:
           echo "### [View in Platform Orchestrator]($ENV_URL)" >> pr_message.txt
           echo "Deployment ID: $DEPLOYMENT_ID" >> pr_message.txt
 
-          echo "" >> pr_message.txt
-          echo "### Domains:" >> pr_message.txt
-          echo "" >> pr_message.txt
-          echo "$DOMAINS" >> pr_message.txt
-          echo "" >> pr_message.txt
+          if ! [ -z $DOMAINS ]; then
+            echo "" >> pr_message.txt
+            echo "### Domains:" >> pr_message.txt
+            echo "" >> pr_message.txt
+            echo "$DOMAINS" >> pr_message.txt
+            echo "" >> pr_message.txt
+          fi
 
           echo "<details><summary>Deployment diff</summary>" >> pr_message.txt
           echo "" >> pr_message.txt
