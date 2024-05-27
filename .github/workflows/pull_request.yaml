@@ -63,6 +63,7 @@ jobs:
               --org ${{ vars.HUMANITEC_ORG }} \
               --app ${{ vars.APP_NAME }} \
               --env ${{ env.ENVIRONMENT_ID }} \
+              --message "$(git show -s --format=%s)" \
               --property "containers.demo.image=${{ steps.build_push.outputs.IMAGE }}" \
               --wait
       - name: Build Comment Message
