@@ -11,4 +11,4 @@ app.get('/', (req, res) => {
 const PORT = 8080;
 app.listen(PORT);
 
-console.log(`Now listening on port ${PORT}`);
+console.log(`Now running on port ${PORT}`);
