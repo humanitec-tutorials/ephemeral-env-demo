@@ -43,9 +43,9 @@ jobs:
         run: |
           humctl score deploy \
               --token ${{ secrets.HUMANITEC_TOKEN }} \
-              --message "$(git show -s --format=%s)" \
               --org ${{ vars.HUMANITEC_ORG }} \
               --app ${{ vars.APP_NAME }} \
               --env ${{ env.ENVIRONMENT }} \
+              --message "$(git show -s --format=%s)" \
               -f score.yaml \
               --property "containers.demo.image=${{ steps.build_push.outputs.IMAGE }}"
