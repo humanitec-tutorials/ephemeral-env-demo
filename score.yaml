@@ -15,4 +15,4 @@ containers:
   demo:
     image: . # Set by pipeline
     variables:
-      MESSAGE: "Hello deployer!"
+      MESSAGE: "Hello ephemeral env!"
