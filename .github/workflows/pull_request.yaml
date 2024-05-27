@@ -18,6 +18,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Checkout using the head commit to read commit message further down
+          ref: ${{ github.event.pull_request.head.sha }}
       
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
