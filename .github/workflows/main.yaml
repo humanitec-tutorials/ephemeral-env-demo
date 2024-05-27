@@ -24,6 +24,10 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GH_TOKEN }}
 
+      - name: Output commits url
+        run: |
+          echo Commits url: ${{ github.event.pull_request.commits_url }}
+
       - name: Build and push image
         id: build_push
         run: |
