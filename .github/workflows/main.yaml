@@ -24,10 +24,6 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GH_TOKEN }}
 
-      - name: Output commits url
-        run: |
-          echo Commits url: ${{ github.event.pull_request.commits_url }}
-
       - name: Build and push image
         id: build_push
         run: |
@@ -50,6 +46,6 @@ jobs:
               --org ${{ vars.HUMANITEC_ORG }} \
               --app ${{ vars.APP_NAME }} \
               --env ${{ env.ENVIRONMENT }} \
-              --message "$(curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "${{ github.event.pull_request.commits_url }}?per_page=10" | jq -r .[0].commit.message)" \
+              --message "$(git show -s --format=%s)" \
               -f score.yaml \
               --property "containers.demo.image=${{ steps.build_push.outputs.IMAGE }}"
