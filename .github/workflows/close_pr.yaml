@@ -4,13 +4,17 @@ on:
     types:
       - closed
 
+# Pinning the humctl version individually for each workflow to be able to test a version bump
+env:
+  HUMCTL_VERSION: '0.24.0'
+
 jobs:
   cleanup:
     runs-on: ubuntu-latest
     steps:
       - uses: humanitec/setup-cli-action@v1
         with:
-          version: ${{ vars.HUMCTL_VERSION }}
+          version: ${{ env.HUMCTL_VERSION }}
       
       - name: Delete Humanitec Env
         run: |

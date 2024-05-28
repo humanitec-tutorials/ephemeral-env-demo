@@ -6,6 +6,8 @@ on:
 
 env:
   ENVIRONMENT: 'development'
+  # Pinning the humctl version individually for each workflow to be able to test a version bump
+  HUMCTL_VERSION: '0.24.0'
 
 jobs:
   build:
@@ -15,7 +17,7 @@ jobs:
 
       - uses: humanitec/setup-cli-action@v1
         with:
-          version: ${{ vars.HUMCTL_VERSION }}
+          version: ${{ env.HUMCTL_VERSION }}
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
