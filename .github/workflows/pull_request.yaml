@@ -2,57 +2,93 @@ name: Pull Request
 on:
   pull_request:
     types: [opened, reopened, synchronize]
+
 permissions:
   contents: read
   pull-requests: write
+
 env:
   BASE_ENVIRONMENT: 'development'
   ENVIRONMENT_TYPE: 'development'
-  HUMCTL_VERSION: '0.23.2'
   ENVIRONMENT_ID: pr-${{ github.event.number }}
   ENVIRONMENT_NAME: PR-${{ github.event.number }}
+  # Pinning the humctl version individually for each workflow to be able to test a version bump
+  HUMCTL_VERSION: '0.24.0'
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+        with:
+          # Checkout using the head commit to read commit message further down
+          ref: ${{ github.event.pull_request.head.sha }}
+      
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GH_TOKEN }}
+
       - uses: humanitec/setup-cli-action@v1
         with:
           version: ${{ env.HUMCTL_VERSION }}
+
       - name: Create Humanitec Env
+        if: ${{ github.event.action == 'opened' || github.event.action == 'reopened' }}
         run: |
-            humctl create environment ${{ env.ENVIRONMENT_ID }} \
-              --token ${{ secrets.HUMANITEC_TOKEN }} \
-              --org ${{ vars.HUMANITEC_ORG }} \
-              --app ${{ vars.APP_NAME }} \
-              --name ${{ env.ENVIRONMENT_NAME }} \
-              -t ${{ env.ENVIRONMENT_TYPE }} \
-              --from ${{ env.BASE_ENVIRONMENT }} \
-              || true
-      - uses: score-spec/setup-score@v2
-        with:
-          file: score-humanitec
-          version: ${{ env.SCORE_HUMANITEC_VERSION }}
+          humctl create environment ${{ env.ENVIRONMENT_ID }} \
+            --token ${{ secrets.HUMANITEC_TOKEN }} \
+            --org ${{ vars.HUMANITEC_ORG }} \
+            --app ${{ vars.APP_NAME }} \
+            --name ${{ env.ENVIRONMENT_NAME }} \
+            -t ${{ env.ENVIRONMENT_TYPE }} \
+            --from ${{ env.BASE_ENVIRONMENT }}
+        
+      - name: Build and push image
+        id: build_push
+        run: |
+          # Make sure repo name is all lowercase for docker push
+          GH_REPOSITORY=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')
+
+          TAG=$GH_REPOSITORY:${{ env.ENVIRONMENT_ID }}
+          IMAGE=ghcr.io/$TAG
+
+          # Set this label to connect the package to the GitHub repo to make it public
+          docker build . --tag $IMAGE  \
+            --label "org.opencontainers.image.source=https://github.com/$GH_REPOSITORY"
+          docker push $IMAGE
+
+          # Get image digest to pass on to deployment for pinning the image to that digest
+          IMAGE_DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' $IMAGE)
+          echo "IMAGE_DIGEST=$IMAGE_DIGEST" >> $GITHUB_OUTPUT
       - name: Run Score
         run: |
           humctl score deploy \
               -f score.yaml \
-              --extensions humanitec.score.yaml \
               --token ${{ secrets.HUMANITEC_TOKEN }} \
               --org ${{ vars.HUMANITEC_ORG }} \
               --app ${{ vars.APP_NAME }} \
               --env ${{ env.ENVIRONMENT_ID }} \
+              --message "$(git show -s --format=%s)" \
+              --image ${{ steps.build_push.outputs.IMAGE_DIGEST }} \
               --wait
       - name: Build Comment Message
         if: ${{ always() }}
         run: |
+          # This step demonstrates a range of possible outputs you may want to include
+          # in your PR comments with each run of this workflow.
+
           DEPLOYMENT_ID=$(humctl get deployment . -o json \
               --token ${{ secrets.HUMANITEC_TOKEN }} \
               --org ${{ vars.HUMANITEC_ORG }} \
               --app ${{ vars.APP_NAME }} \
               --env ${{ env.ENVIRONMENT_ID }} \
               | jq -r .metadata.id)
+
           ENV_URL="https://app.humanitec.io/orgs/"${{ vars.HUMANITEC_ORG }}"/apps/"${{ vars.APP_NAME }}"/envs/"${{ env.ENVIRONMENT_ID }}"/deploys/"${DEPLOYMENT_ID}
+
           DOMAINS=$(humctl get active-resources \
                       --token ${{ secrets.HUMANITEC_TOKEN }} \
                       --org ${{ vars.HUMANITEC_ORG }} \
@@ -65,6 +101,7 @@ jobs:
               --org ${{ vars.HUMANITEC_ORG }} \
               --app ${{ vars.APP_NAME }} \
               --env ${{ env.ENVIRONMENT_ID }} -o json)
+          
           if [ "$DEPLOYMENT_ERRORS" = "[]" ]; then
             echo "## Deployment successfully completed for ${{ env.ENVIRONMENT_NAME }}! :tada:" >> pr_message.txt
             echo "" >> pr_message.txt
@@ -92,14 +129,16 @@ jobs:
             echo "" >> pr_message.txt
           fi
           
-          echo "### [View in Humanitec]($ENV_URL)" >> pr_message.txt
+          echo "### [View in Platform Orchestrator]($ENV_URL)" >> pr_message.txt
           echo "Deployment ID: $DEPLOYMENT_ID" >> pr_message.txt
 
-          echo "" >> pr_message.txt
-          echo "### Domains:" >> pr_message.txt
-          echo "" >> pr_message.txt
-          echo "$DOMAINS" >> pr_message.txt
-          echo "" >> pr_message.txt
+          if ! [ -z $DOMAINS ]; then
+            echo "" >> pr_message.txt
+            echo "### Domains:" >> pr_message.txt
+            echo "" >> pr_message.txt
+            echo "$DOMAINS" >> pr_message.txt
+            echo "" >> pr_message.txt
+          fi
 
           echo "<details><summary>Deployment diff</summary>" >> pr_message.txt
           echo "" >> pr_message.txt
@@ -108,8 +147,8 @@ jobs:
           echo "" >> pr_message.txt
           humctl diff sets env/${{ env.ENVIRONMENT_ID }} env/${{ env.BASE_ENVIRONMENT }} \
               --token ${{ secrets.HUMANITEC_TOKEN }} \
-              --org ${{ vars.HUMANITEC_ORG_ID }} \
-              --app ${{ env.APP_NAME }} -o json >> pr_message.txt
+              --org ${{ vars.HUMANITEC_ORG }} \
+              --app ${{ vars.APP_NAME }} -o json >> pr_message.txt
           echo "" >> pr_message.txt
           echo '```' >> pr_message.txt
           echo "" >> pr_message.txt
@@ -131,9 +170,10 @@ jobs:
             echo "" >> pr_message.txt
             echo "</details>" >> pr_message.txt
           
-            echo "<details><summary>Resources Graph</summary>" >> pr_message.txt
+            echo "<details><summary>Resource Graph</summary>" >> pr_message.txt
             echo "" >> pr_message.txt
-            echo "### Resources Graph:" >> pr_message.txt
+            echo "### Resource Graph:" >> pr_message.txt
+            echo "Use a [Graphviz](https://graphviz.org) viewer for a visual representation." >> pr_message.txt
             echo '```none' >> pr_message.txt
             echo "" >> pr_message.txt
             humctl resources graph \
@@ -148,6 +188,7 @@ jobs:
           fi
 
           cat pr_message.txt
+
       - name: Comment PR
         if: ${{ always() }}
         uses: thollander/actions-comment-pull-request@v2

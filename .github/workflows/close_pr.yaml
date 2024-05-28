@@ -1,10 +1,13 @@
-name: Pull Request
+name: Close Pull Request
 on:
   pull_request:
     types:
       - closed
+
+# Pinning the humctl version individually for each workflow to be able to test a version bump
 env:
-  HUMCTL_VERSION: '0.23.2'
+  HUMCTL_VERSION: '0.24.0'
+
 jobs:
   cleanup:
     runs-on: ubuntu-latest
@@ -12,6 +15,7 @@ jobs:
       - uses: humanitec/setup-cli-action@v1
         with:
           version: ${{ env.HUMCTL_VERSION }}
+      
       - name: Delete Humanitec Env
         run: |
           humctl delete env pr-${{ github.event.number }} \
