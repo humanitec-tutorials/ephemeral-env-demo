@@ -59,8 +59,8 @@ jobs:
 
           docker push $IMAGE
           # Get image digest to pass on to deployment
-          IMAGE_DIGEST=$(docker inspect $IMAGE | jq -r .[].Id)
-          echo IMAGE_DIGEST: $IMAGE_DIGEST     
+          IMAGE_DIGEST=$(docker images --no-trunc --quiet $IMAGE)
+          echo IMAGE_DIGEST: $IMAGE_DIGEST
 
           echo "IMAGE=$IMAGE" >> $GITHUB_OUTPUT
       - name: Run Score
