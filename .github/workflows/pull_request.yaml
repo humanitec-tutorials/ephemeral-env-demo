@@ -72,7 +72,7 @@ jobs:
               --app ${{ vars.APP_NAME }} \
               --env ${{ env.ENVIRONMENT_ID }} \
               --message "$(git show -s --format=%s)" \
-              --property "containers.demo.image=${{ steps.build_push.outputs.IMAGE_DIGEST }}" \
+              --image ${{ steps.build_push.outputs.IMAGE_DIGEST }} \
               --wait
       - name: Build Comment Message
         if: ${{ always() }}

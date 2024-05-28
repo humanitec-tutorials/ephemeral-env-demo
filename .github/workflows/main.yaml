@@ -50,4 +50,4 @@ jobs:
               --env ${{ env.ENVIRONMENT }} \
               --message "$(git show -s --format=%s)" \
               -f score.yaml \
-              --property "containers.demo.image=${{ steps.build_push.outputs.IMAGE }}"
+              --image ${{ steps.build_push.outputs.IMAGE }}
