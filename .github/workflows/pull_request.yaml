@@ -5,6 +5,7 @@ on:
 
 permissions:
   contents: read
+  packages: write
   pull-requests: write
 
 env:
@@ -23,13 +24,13 @@ jobs:
         with:
           # Checkout using the head commit to read commit message further down
           ref: ${{ github.event.pull_request.head.sha }}
-      
+
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.GH_TOKEN }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: humanitec/setup-cli-action@v1
         with:
@@ -41,11 +42,11 @@ jobs:
           humctl create environment ${{ env.ENVIRONMENT_ID }} \
             --token ${{ secrets.HUMANITEC_TOKEN }} \
             --org ${{ vars.HUMANITEC_ORG }} \
-            --app ${{ vars.APP_NAME }} \
+            --app ${{ vars.HUMANITEC_APP }} \
             --name ${{ env.ENVIRONMENT_NAME }} \
             -t ${{ env.ENVIRONMENT_TYPE }} \
             --from ${{ env.BASE_ENVIRONMENT }}
-        
+
       - name: Build and push image
         id: build_push
         run: |
@@ -69,7 +70,7 @@ jobs:
               -f score.yaml \
               --token ${{ secrets.HUMANITEC_TOKEN }} \
               --org ${{ vars.HUMANITEC_ORG }} \
-              --app ${{ vars.APP_NAME }} \
+              --app ${{ vars.HUMANITEC_APP }} \
               --env ${{ env.ENVIRONMENT_ID }} \
               --message "$(git show -s --format=%s)" \
               --image ${{ steps.build_push.outputs.IMAGE_DIGEST }} \
@@ -83,25 +84,25 @@ jobs:
           DEPLOYMENT_ID=$(humctl get deployment . -o json \
               --token ${{ secrets.HUMANITEC_TOKEN }} \
               --org ${{ vars.HUMANITEC_ORG }} \
-              --app ${{ vars.APP_NAME }} \
+              --app ${{ vars.HUMANITEC_APP }} \
               --env ${{ env.ENVIRONMENT_ID }} \
               | jq -r .metadata.id)
 
-          ENV_URL="https://app.humanitec.io/orgs/"${{ vars.HUMANITEC_ORG }}"/apps/"${{ vars.APP_NAME }}"/envs/"${{ env.ENVIRONMENT_ID }}"/deploys/"${DEPLOYMENT_ID}
+          ENV_URL="https://app.humanitec.io/orgs/"${{ vars.HUMANITEC_ORG }}"/apps/"${{ vars.HUMANITEC_APP }}"/envs/"${{ env.ENVIRONMENT_ID }}"/deploys/"${DEPLOYMENT_ID}
 
           DOMAINS=$(humctl get active-resources \
                       --token ${{ secrets.HUMANITEC_TOKEN }} \
                       --org ${{ vars.HUMANITEC_ORG }} \
-                      --app ${{ vars.APP_NAME }} \
+                      --app ${{ vars.HUMANITEC_APP }} \
                       --env ${{ env.ENVIRONMENT_ID }} -o json \
                       | jq -r '. | map(. | select(.metadata.type == "dns")) | map((.metadata.res_id | split(".") | .[1]) + ": [" + .status.resource.host + "](https://" + .status.resource.host + ")") | join("\n")')
-          
+
           DEPLOYMENT_ERRORS=$(humctl get deployment-error \
               --token ${{ secrets.HUMANITEC_TOKEN }} \
               --org ${{ vars.HUMANITEC_ORG }} \
-              --app ${{ vars.APP_NAME }} \
+              --app ${{ vars.HUMANITEC_APP }} \
               --env ${{ env.ENVIRONMENT_ID }} -o json)
-          
+
           if [ "$DEPLOYMENT_ERRORS" = "[]" ]; then
             echo "## Deployment successfully completed for ${{ env.ENVIRONMENT_NAME }}! :tada:" >> pr_message.txt
             echo "" >> pr_message.txt
@@ -128,7 +129,7 @@ jobs:
             echo "</details>" >> pr_message.txt
             echo "" >> pr_message.txt
           fi
-          
+
           echo "### [View in Platform Orchestrator]($ENV_URL)" >> pr_message.txt
           echo "Deployment ID: $DEPLOYMENT_ID" >> pr_message.txt
 
@@ -148,7 +149,7 @@ jobs:
           humctl diff sets env/${{ env.ENVIRONMENT_ID }} env/${{ env.BASE_ENVIRONMENT }} \
               --token ${{ secrets.HUMANITEC_TOKEN }} \
               --org ${{ vars.HUMANITEC_ORG }} \
-              --app ${{ vars.APP_NAME }} -o json >> pr_message.txt
+              --app ${{ vars.HUMANITEC_APP }} -o json >> pr_message.txt
           echo "" >> pr_message.txt
           echo '```' >> pr_message.txt
           echo "" >> pr_message.txt
@@ -164,12 +165,12 @@ jobs:
                 --env ${{ env.ENVIRONMENT_ID }} \
                 --token ${{ secrets.HUMANITEC_TOKEN }} \
                 --org ${{ vars.HUMANITEC_ORG }} \
-                --app ${{ vars.APP_NAME }} >> pr_message.txt
+                --app ${{ vars.HUMANITEC_APP }} >> pr_message.txt
             echo "" >> pr_message.txt
             echo '```' >> pr_message.txt
             echo "" >> pr_message.txt
             echo "</details>" >> pr_message.txt
-          
+
             echo "<details><summary>Resource Graph</summary>" >> pr_message.txt
             echo "" >> pr_message.txt
             echo "### Resource Graph:" >> pr_message.txt
@@ -180,7 +181,7 @@ jobs:
                 --env ${{ env.ENVIRONMENT_ID }} \
                 --token ${{ secrets.HUMANITEC_TOKEN }} \
                 --org ${{ vars.HUMANITEC_ORG }} \
-                --app ${{ vars.APP_NAME }} >> pr_message.txt
+                --app ${{ vars.HUMANITEC_APP }} >> pr_message.txt
             echo "" >> pr_message.txt
             echo '```' >> pr_message.txt
             echo "" >> pr_message.txt

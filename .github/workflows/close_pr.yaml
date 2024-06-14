@@ -15,10 +15,10 @@ jobs:
       - uses: humanitec/setup-cli-action@v1
         with:
           version: ${{ env.HUMCTL_VERSION }}
-      
+
       - name: Delete Humanitec Env
         run: |
           humctl delete env pr-${{ github.event.number }} \
               --token ${{ secrets.HUMANITEC_TOKEN }} \
               --org ${{ vars.HUMANITEC_ORG }} \
-              --app ${{ vars.APP_NAME }}
+              --app ${{ vars.HUMANITEC_APP }}
