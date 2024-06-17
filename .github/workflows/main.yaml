@@ -4,6 +4,10 @@ on:
     branches:
       - "main"
 
+permissions:
+  contents: read
+  packages: write
+
 env:
   ENVIRONMENT: 'development'
   # Pinning the humctl version individually for each workflow to be able to test a version bump
@@ -24,7 +28,7 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.GH_TOKEN }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push image
         id: build_push
@@ -39,15 +43,18 @@ jobs:
           docker build . --tag $IMAGE  \
             --label "org.opencontainers.image.source=https://github.com/$GH_REPOSITORY"
           docker push $IMAGE
-          echo "IMAGE=$IMAGE" >> $GITHUB_OUTPUT
+
+          # Get image digest to pass on to deployment for pinning the image to that digest
+          IMAGE_DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' $IMAGE)
+          echo "IMAGE_DIGEST=$IMAGE_DIGEST" >> $GITHUB_OUTPUT
 
       - name: Deploy Score
         run: |
           humctl score deploy \
               --token ${{ secrets.HUMANITEC_TOKEN }} \
               --org ${{ vars.HUMANITEC_ORG }} \
-              --app ${{ vars.APP_NAME }} \
+              --app ${{ vars.HUMANITEC_APP }} \
               --env ${{ env.ENVIRONMENT }} \
               --message "$(git show -s --format=%s)" \
               -f score.yaml \
-              --image ${{ steps.build_push.outputs.IMAGE }}
+              --image ${{ steps.build_push.outputs.IMAGE_DIGEST }}
