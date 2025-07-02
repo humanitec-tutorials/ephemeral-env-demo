@@ -14,7 +14,7 @@ env:
   ENVIRONMENT_ID: pr-${{ github.event.number }}
   ENVIRONMENT_NAME: PR-${{ github.event.number }}
   # Pinning the humctl version individually for each workflow to be able to test a version bump
-  HUMCTL_VERSION: '0.24.0'
+  HUMCTL_VERSION: '0.39.8'
 
 jobs:
   build:
@@ -174,14 +174,15 @@ jobs:
             echo "<details><summary>Resource Graph</summary>" >> pr_message.txt
             echo "" >> pr_message.txt
             echo "### Resource Graph:" >> pr_message.txt
-            echo "Use a [Graphviz](https://graphviz.org) viewer for a visual representation." >> pr_message.txt
+            echo "Click the link to open." >> pr_message.txt
             echo '```none' >> pr_message.txt
             echo "" >> pr_message.txt
             humctl resources graph \
-                --env ${{ env.ENVIRONMENT_ID }} \
+                env ${{ env.ENVIRONMENT_ID }} \
                 --token ${{ secrets.HUMANITEC_TOKEN }} \
                 --org ${{ vars.HUMANITEC_ORG }} \
-                --app ${{ vars.HUMANITEC_APP }} >> pr_message.txt
+                --app ${{ vars.HUMANITEC_APP }} \
+                --open=false >> pr_message.txt
             echo "" >> pr_message.txt
             echo '```' >> pr_message.txt
             echo "" >> pr_message.txt
