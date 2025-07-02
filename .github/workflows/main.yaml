@@ -11,7 +11,7 @@ permissions:
 env:
   ENVIRONMENT: 'development'
   # Pinning the humctl version individually for each workflow to be able to test a version bump
-  HUMCTL_VERSION: '0.24.0'
+  HUMCTL_VERSION: '0.39.8'
 
 jobs:
   build:
